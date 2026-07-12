@@ -6,8 +6,8 @@ const expected = {
   mac: [{ label: 'universal macOS DMG', pattern: /-mac-universal\.dmg$/i }],
   windows: [{ label: 'Windows x64 installer', pattern: /-windows-x64\.exe$/i }],
   linux: [
-    { label: 'Linux x64 AppImage', pattern: /-linux-x64\.AppImage$/ },
-    { label: 'Linux x64 Debian package', pattern: /-linux-x64\.deb$/i },
+    { label: 'Linux x64 AppImage', pattern: /-linux-(?:x64|x86_64)\.AppImage$/ },
+    { label: 'Linux x64 Debian package', pattern: /-linux-(?:x64|amd64)\.deb$/i },
   ],
 }
 
@@ -16,7 +16,7 @@ if (!(platform in expected)) {
   process.exit(2)
 }
 
-const releaseDir = resolve('release')
+const releaseDir = resolve(process.env.ROCKET_RELEASE_DIR || 'release')
 let names
 try {
   names = await readdir(releaseDir)

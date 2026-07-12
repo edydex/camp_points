@@ -2,6 +2,7 @@
   "name": "rocket-fuel-camp-points",
   "version": "0.1.0",
   "description": "Offline dual-display rocket fuel point tracker for kids camp",
+  "desktopName": "org.camp.rocket-fuel-points.desktop",
   "author": "Rocket Fuel Camp Points contributors",
   "private": true,
   "type": "module",
@@ -17,10 +18,10 @@
     "test:coverage": "vitest run --coverage",
     "test:e2e": "npm run build && playwright test",
     "pack": "npm run build && electron-builder --dir",
-    "dist": "npm run build && electron-builder",
-    "dist:win": "npm run build && electron-builder --win --x64",
-    "dist:mac": "npm run build && electron-builder --mac --universal",
-    "dist:linux": "npm run build && electron-builder --linux --x64",
+    "dist": "npm run build && electron-builder --publish never",
+    "dist:win": "npm run build && electron-builder --win --x64 --publish never",
+    "dist:mac": "npm run build && electron-builder --mac --universal --publish never",
+    "dist:linux": "npm run build && electron-builder --linux --x64 --publish never",
     "verify:artifacts": "node scripts/verify-release-artifacts.mjs"
   },
   "dependencies": {

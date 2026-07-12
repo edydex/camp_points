@@ -43,6 +43,7 @@ linux:
   category: Education
   icon: build/icon.png
   executableName: rocket-fuel-camp-points
+  syncDesktopName: true
   maintainer: Rocket Fuel Camp Points contributors
   synopsis: Offline dual-display rocket fuel point tracker for kids camp
   target:
