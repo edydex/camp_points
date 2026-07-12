@@ -37,7 +37,7 @@ jobs:
       matrix:
         include:
           - platform: mac
-            os: macos-latest
+            os: macos-15
             command: npm run dist:mac
             artifact: rocket-fuel-macos-universal
             files: release/*.dmg
@@ -67,7 +67,7 @@ jobs:
       - run: npm ci
       - run: ${{ matrix.command }}
       - run: npm run verify:artifacts -- ${{ matrix.platform }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact }}
           path: ${{ matrix.files }}
@@ -81,7 +81,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           pattern: rocket-fuel-*
           path: release-assets
@@ -99,10 +99,11 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          if gh release view "${GITHUB_REF_NAME}" >/dev/null 2>&1; then
-            gh release upload "${GITHUB_REF_NAME}" release-assets/* --clobber
+          if gh release view "${GITHUB_REF_NAME}" --repo "${GITHUB_REPOSITORY}" >/dev/null 2>&1; then
+            gh release upload "${GITHUB_REF_NAME}" release-assets/* --clobber --repo "${GITHUB_REPOSITORY}"
           else
             gh release create "${GITHUB_REF_NAME}" release-assets/* \
+              --repo "${GITHUB_REPOSITORY}" \
               --verify-tag \
               --title "Rocket Fuel Camp Points ${GITHUB_REF_NAME}" \
               --generate-notes
