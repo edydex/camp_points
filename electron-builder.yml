@@ -1,0 +1,57 @@
+appId: org.camp.rocket-fuel-points
+productName: Rocket Fuel Camp Points
+copyright: Copyright © 2026 Rocket Fuel Camp Points contributors
+
+directories:
+  output: release
+  buildResources: build
+
+files:
+  - out/**/*
+  - package.json
+  - THIRD_PARTY_NOTICES.md
+
+asar: true
+npmRebuild: false
+
+mac:
+  category: public.app-category.education
+  icon: build/icon.png
+  identity: null
+  target:
+    - target: dmg
+      arch:
+        - universal
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-windows-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Rocket Fuel Camp Points
+
+linux:
+  category: Education
+  icon: build/icon.png
+  executableName: rocket-fuel-camp-points
+  maintainer: Rocket Fuel Camp Points contributors
+  synopsis: Offline dual-display rocket fuel point tracker for kids camp
+  target:
+    - target: AppImage
+      arch:
+        - x64
+    - target: deb
+      arch:
+        - x64
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
+
+publish: null

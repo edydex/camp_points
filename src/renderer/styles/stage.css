@@ -1,0 +1,795 @@
+.rocket-stage {
+  --stage-ink: #f8fbff;
+  --stage-muted: #a8b7d9;
+  --stage-accent: #67e8ff;
+  --stage-accent-2: #b08cff;
+  --stage-panel: rgba(9, 21, 57, 0.78);
+  --stage-panel-solid: #102659;
+  --stage-line: rgba(148, 205, 255, 0.28);
+  --stage-shadow: rgba(0, 4, 25, 0.65);
+  --stage-heading: "Arial Rounded MT Bold", "Avenir Next", system-ui, sans-serif;
+  --stage-body: "Avenir Next", Inter, system-ui, sans-serif;
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  overflow: hidden;
+  color: var(--stage-ink);
+  background: #06133c;
+  font-family: var(--stage-body);
+  user-select: none;
+}
+
+.rocket-stage--preview {
+  min-height: 0;
+  border-radius: inherit;
+}
+
+.stage-backdrop,
+.stage-particles,
+.stage-pixi-layer,
+.stage-dom-particles,
+.stage-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stage-backdrop {
+  z-index: -3;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 115%, rgba(67, 109, 255, 0.42), transparent 39%),
+    linear-gradient(160deg, #091e57 0%, #08133f 48%, #030923 100%);
+}
+
+.stage-nebula {
+  position: absolute;
+  width: 48vmax;
+  height: 34vmax;
+  border-radius: 50%;
+  filter: blur(7vmax);
+  opacity: 0.3;
+  animation: stage-nebula-drift 24s ease-in-out infinite alternate;
+}
+
+.stage-nebula--one {
+  left: -18vmax;
+  top: -12vmax;
+  background: #0077ff;
+}
+
+.stage-nebula--two {
+  right: -17vmax;
+  bottom: -15vmax;
+  background: #7b38ff;
+  animation-delay: -11s;
+}
+
+.stage-planet {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.9;
+}
+
+.stage-planet--left {
+  width: 13vmax;
+  height: 13vmax;
+  left: -5vmax;
+  bottom: -4vmax;
+  background:
+    radial-gradient(circle at 32% 24%, #fff 0 1%, transparent 2%),
+    radial-gradient(circle at 35% 30%, #66e8ff, #3769e7 38%, #18235e 68%);
+  box-shadow: 0 0 5vmax rgba(79, 194, 255, 0.25);
+}
+
+.stage-planet--right {
+  width: 5vmax;
+  height: 5vmax;
+  right: 5vw;
+  top: 16vh;
+  background: radial-gradient(circle at 30% 28%, #fff2a1, #ff8e5d 38%, #842e71 72%);
+  box-shadow: 0 0 3vmax rgba(255, 103, 131, 0.3);
+}
+
+.stage-horizon {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  bottom: -4vh;
+  height: 13vh;
+  border-radius: 50% 50% 0 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(84, 218, 255, 0.3), transparent 61%);
+  border-top: 1px solid rgba(130, 232, 255, 0.24);
+}
+
+.stage-grid { display: none; }
+
+.stage-vignette {
+  background: radial-gradient(ellipse at center, transparent 48%, rgba(0, 2, 17, 0.67) 112%);
+}
+
+/* Theme: bright premium cartoon science-fiction. */
+.rocket-stage--cartoon {
+  --stage-accent: #64ecff;
+  --stage-accent-2: #b185ff;
+  --stage-panel: rgba(16, 42, 101, 0.82);
+  --stage-panel-solid: #183677;
+  --stage-line: rgba(156, 225, 255, 0.3);
+}
+
+.rocket-stage--cartoon .stage-backdrop::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.22;
+  background-image: radial-gradient(circle, #fff 0 1px, transparent 1.8px);
+  background-size: 5.7vw 5.7vw;
+  transform: rotate(8deg) scale(1.2);
+}
+
+/* Ambient Pixi + accessible fallback particle layers. */
+.stage-particles { z-index: -1; overflow: hidden; }
+.stage-pixi-layer, .stage-pixi-canvas { width: 100%; height: 100%; }
+.stage-pixi-canvas { display: block; }
+.stage-dom-particles { opacity: 1; transition: opacity 300ms ease; }
+.stage-dom-particles--hidden { opacity: 0; }
+.stage-stars, .stage-dust, .stage-confetti { position: absolute; inset: 0; }
+
+.stage-stars i {
+  position: absolute;
+  left: var(--particle-x);
+  top: var(--particle-y);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  opacity: var(--particle-alpha);
+  background: #fff;
+  box-shadow: 0 0 calc(var(--particle-size) * 4) #8ee8ff;
+  animation: stage-star-pulse var(--particle-duration) ease-in-out var(--particle-delay) infinite;
+}
+
+.stage-dust i {
+  position: absolute;
+  left: var(--particle-x);
+  top: var(--particle-y);
+  width: var(--particle-size);
+  height: var(--particle-size);
+  border-radius: 50%;
+  opacity: var(--particle-alpha);
+  background: var(--stage-accent-2);
+  filter: blur(calc(var(--particle-size) * .22));
+  animation: stage-dust-drift var(--particle-duration) ease-in-out var(--particle-delay) infinite alternate;
+}
+
+.stage-confetti i {
+  position: absolute;
+  left: var(--particle-x);
+  top: -4vh;
+  width: var(--particle-size);
+  height: calc(var(--particle-size) * .55);
+  border-radius: 2px;
+  background: hsl(var(--particle-hue) 90% 63%);
+  animation: stage-confetti-fall var(--particle-duration) linear var(--particle-delay) infinite;
+}
+
+/* Stage chrome. */
+.stage-hud {
+  position: absolute;
+  z-index: 6;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: clamp(62px, 9.5vh, 108px);
+  padding: clamp(14px, 2.2vh, 28px) clamp(20px, 3vw, 58px);
+  pointer-events: none;
+}
+
+.stage-title-lockup { display: flex; align-items: center; gap: clamp(10px, 1.1vw, 22px); min-width: 0; }
+.stage-title-copy { min-width: 0; }
+.stage-title-lockup p,
+.stage-title-lockup h1 { margin: 0; }
+.stage-title-lockup p {
+  margin-bottom: .14em;
+  color: var(--stage-accent);
+  font-size: clamp(8px, .78vw, 14px);
+  font-weight: 800;
+  letter-spacing: .19em;
+  text-transform: uppercase;
+}
+.stage-title-lockup h1 {
+  overflow: hidden;
+  max-width: 54vw;
+  color: var(--stage-ink);
+  font-family: var(--stage-heading);
+  font-size: clamp(20px, 2.15vw, 43px);
+  /* The heading is also the horizontal ellipsis boundary. Font-relative
+     breathing room keeps rounded-font descenders (y, g, p, q) inside that
+     clipped box at projector, preview, and compact responsive sizes. */
+  line-height: 1.08;
+  padding-block: .02em .14em;
+  letter-spacing: -.025em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 3px 16px rgba(0, 0, 0, 0.4);
+}
+
+.stage-mission-mark {
+  position: relative;
+  width: clamp(34px, 3.4vw, 64px);
+  aspect-ratio: 1;
+  flex: none;
+  border: 2px solid var(--stage-accent);
+  border-radius: 50%;
+  box-shadow: inset 0 0 18px color-mix(in srgb, var(--stage-accent), transparent 75%), 0 0 20px color-mix(in srgb, var(--stage-accent), transparent 80%);
+}
+.stage-mission-mark::before,
+.stage-mission-mark::after,
+.stage-mission-mark i { content: ""; position: absolute; border-radius: 50%; }
+.stage-mission-mark::before { inset: 21%; border: 1px solid var(--stage-accent); }
+.stage-mission-mark::after { width: 18%; height: 18%; left: 41%; top: 41%; background: var(--stage-accent); box-shadow: 0 0 10px var(--stage-accent); }
+.stage-mission-mark i { width: 8%; height: 8%; background: var(--stage-ink); animation: stage-orbit 5s linear infinite; transform-origin: 625% 625%; }
+.stage-mission-mark i:nth-child(2) { animation-duration: 7s; transform-origin: 650% 430%; }
+.stage-mission-mark i:nth-child(3) { animation-duration: 9s; transform-origin: 350% 690%; }
+
+.stage-status-badges { display: flex; gap: .55vw; align-items: center; }
+.stage-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .45em;
+  padding: .48em .78em;
+  border: 1px solid var(--stage-line);
+  border-radius: 999px;
+  color: var(--stage-muted);
+  background: var(--stage-panel);
+  backdrop-filter: blur(10px);
+  font-size: clamp(9px, .7vw, 13px);
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.stage-status-badge i { width: .6em; height: .6em; border-radius: 50%; background: currentColor; }
+.stage-status-badge--paused { color: #ffd36c; }
+.stage-status-badge--muted { color: #ff91ab; }
+/* Responsive fleet. */
+.stage-fleet {
+  position: absolute;
+  z-index: 2;
+  inset: clamp(68px, 10.4vh, 120px) clamp(12px, 1.4vw, 28px) clamp(12px, 1.5vh, 24px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(2px, .7vh, 10px);
+  min-height: 0;
+}
+
+.stage-rocket-row {
+  display: grid;
+  grid-template-columns: repeat(var(--stage-row-teams), minmax(0, 1fr));
+  align-items: stretch;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  overflow: visible;
+  flex: 1 1 0;
+  margin-inline: auto;
+}
+
+.stage-rocket-row:only-child { flex-basis: 100%; }
+.stage-rocket-row[data-row="2"] { width: var(--stage-row-width); }
+
+.rocket-card {
+  --rocket-card-gap: clamp(4px, .55vh, 9px);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr);
+  min-width: 0;
+  min-height: 0;
+  overflow: visible;
+  padding: var(--rocket-card-gap) clamp(2px, .4vw, 8px) 0;
+  transform-origin: 50% 100%;
+}
+
+.rocket-team-label {
+  position: relative;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  max-width: 94%;
+  min-width: 48%;
+  min-height: clamp(27px, 4.2vh, 52px);
+  margin: 0 auto;
+  padding: .38em .8em .4em .45em;
+  overflow: hidden;
+  border: 1px solid var(--stage-line);
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--team-color), #10234f 74%), var(--stage-panel));
+  box-shadow: 0 7px 23px rgba(0, 0, 0, .28), inset 0 1px 0 rgba(255, 255, 255, .16);
+  backdrop-filter: blur(9px);
+}
+
+.rocket-team-index {
+  display: grid;
+  width: clamp(19px, 2.1vh, 30px);
+  aspect-ratio: 1;
+  place-items: center;
+  flex: none;
+  margin-right: .48em;
+  border-radius: 50%;
+  color: #fff;
+  background: var(--team-color);
+  box-shadow: 0 0 15px color-mix(in srgb, var(--team-color), transparent 45%);
+}
+.rocket-team-index svg { width: 58%; height: 58%; }
+.rocket-team-name {
+  overflow: hidden;
+  color: #fff;
+  font-family: var(--stage-heading);
+  font-size: clamp(12px, 1.38vw, 26px);
+  font-weight: 850;
+  line-height: 1;
+  letter-spacing: -.01em;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, .42);
+  white-space: nowrap;
+}
+
+.rocket-card--compact .rocket-team-label { min-height: clamp(23px, 3.2vh, 36px); }
+.rocket-card--compact .rocket-team-name { font-size: clamp(10px, 1.08vw, 19px); }
+.rocket-card--compact .rocket-team-index { width: clamp(17px, 1.65vh, 23px); }
+
+.rocket-vehicle-wrap {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 54%;
+  will-change: transform, opacity;
+}
+
+.rocket-svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: visible;
+  filter: drop-shadow(0 1.5vh 1.1vh rgba(0, 0, 0, .42));
+  transition: transform .24s cubic-bezier(.2, .8, .2, 1);
+}
+
+/* Two-row fleets need a little launch-pad clearance so the larger plume is
+   visible before the vehicle has accelerated away. Only the active rocket is
+   lifted, and the Stage viewport remains the sole intentional crop boundary. */
+.rocket-card[data-phase="active"] { z-index: 8; }
+.rocket-card--compact[data-phase="active"] .rocket-svg,
+.rocket-card--compact[data-phase="launched"] .rocket-svg {
+  transform: translateY(clamp(-68px, -6vh, -30px));
+}
+
+[data-team-count="2"] .rocket-svg { max-width: min(34vw, 64vh); }
+[data-team-count="3"] .rocket-svg { max-width: min(29vw, 60vh); }
+[data-team-count="4"] .rocket-svg { max-width: min(23vw, 57vh); }
+[data-team-count="5"] .rocket-svg { max-width: min(19vw, 54vh); }
+[data-team-count="6"] .rocket-svg,
+[data-team-count="7"] .rocket-svg,
+[data-team-count="8"] .rocket-svg,
+[data-team-count="9"] .rocket-svg,
+[data-team-count="10"] .rocket-svg { max-width: min(19vw, 31vh); }
+
+.rocket-card--selected::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 1% 4% 0;
+  border: 2px solid color-mix(in srgb, var(--team-color), white 34%);
+  border-radius: 48% 48% 24% 24%;
+  opacity: .68;
+  background: radial-gradient(ellipse at center, color-mix(in srgb, var(--team-color), transparent 74%), transparent 64%);
+  box-shadow: inset 0 0 3.8vw color-mix(in srgb, var(--team-color), transparent 72%), 0 0 2vw color-mix(in srgb, var(--team-color), transparent 55%);
+  animation: stage-selection-pulse 1.55s ease-in-out infinite;
+}
+.rocket-card--selected .rocket-team-label { border-color: color-mix(in srgb, var(--team-color), white 46%); }
+.rocket-card--selected .rocket-svg { filter: drop-shadow(0 0 1.15vw color-mix(in srgb, var(--team-color), transparent 32%)) drop-shadow(0 1.5vh 1vh rgba(0, 0, 0, .44)); }
+
+/* Hand-crafted SVG rocket materials. */
+.rocket-metal--shadow { fill: #aebdca; }
+.rocket-metal--light { fill: rgba(255, 255, 255, .48); }
+.rocket-outline { fill: none; stroke: #34445a; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+.rocket-outline--orbiter-wing {
+  stroke: #aebdca;
+  stroke-width: 5;
+  filter: drop-shadow(0 1px 1px rgba(2, 8, 20, .82));
+}
+.rocket-accent { fill: var(--team-color); filter: drop-shadow(0 0 4px color-mix(in srgb, var(--team-color), transparent 35%)); }
+.rocket-fin { fill: color-mix(in srgb, var(--team-color), #152543 33%); }
+.rocket-sidepod { fill: #b8c7d4; }
+.rocket-sidepod-accent { fill: var(--team-color); }
+.rocket-port { fill: #102a4e; stroke: #d7f7ff; stroke-width: 4; }
+.rocket-port-glint, .rocket-canopy-glint { fill: none; stroke: rgba(255, 255, 255, .85); stroke-width: 4; stroke-linecap: round; }
+.rocket-canopy { fill: #133353; stroke: #b9eaff; stroke-width: 3; }
+.rocket-nozzle { fill: #4b5867; stroke: #25313e; stroke-width: 3; }
+
+.rocket-stage--cartoon .rocket-shell { filter: drop-shadow(0 5px 0 rgba(16, 29, 63, .52)); }
+.rocket-stage--cartoon .rocket-outline { stroke-width: 4; }
+.rocket-stage--cartoon .rocket-outline--orbiter-wing { stroke-width: 5.5; }
+
+.tank-bezel { fill: #24354a; stroke: rgba(255, 255, 255, .3); stroke-width: 2; }
+.tank-depth { fill: #071426; }
+.tank-fuel { transition: filter 250ms ease; }
+.tank-fuel-surface { fill: color-mix(in srgb, var(--team-color), white 42%); opacity: .9; filter: drop-shadow(0 0 6px var(--team-color)); transition: cy .65s ease; }
+.tank-glass { pointer-events: none; }
+.tank-glint { fill: none; stroke: rgba(255, 255, 255, .35); stroke-width: 5; stroke-linecap: round; }
+.tank-outline { fill: none; stroke: rgba(203, 239, 255, .68); stroke-width: 2.5; }
+.tank-tick path { fill: none; stroke: rgba(255, 255, 255, .65); stroke-width: 1.7; }
+.tank-tick--minor path { stroke: rgba(255, 255, 255, .35); stroke-width: 1; }
+.tank-tick text { fill: #fff; font-family: var(--stage-body); font-size: 10px; font-weight: 900; paint-order: stroke; stroke: rgba(4, 11, 30, .92); stroke-width: 3px; }
+
+.reserve-tank { opacity: .57; transition: opacity .45s ease, filter .45s ease; }
+.reserve-tank--active { opacity: 1; filter: drop-shadow(0 0 6px var(--team-color)); }
+.reserve-frame { fill: #334354; stroke: rgba(255, 255, 255, .4); stroke-width: 2; }
+.reserve-hose { fill: none; stroke: #4a5a68; stroke-width: 7; stroke-linecap: round; }
+.reserve-label, .reserve-cap { fill: #dff7ff; font-family: var(--stage-body); font-weight: 900; }
+.reserve-label { font-size: 6px; letter-spacing: .11em; }
+.reserve-cap { font-size: 10px; }
+
+.rocket-hull-badge circle { fill: color-mix(in srgb, var(--team-color), #07142d 32%); stroke: rgba(255, 255, 255, .78); stroke-width: 2; }
+.rocket-hull-badge svg { color: #fff; filter: drop-shadow(0 1px 2px rgba(0, 0, 0, .4)); }
+
+.rocket-flame-wrap { opacity: .16; transition: opacity .24s ease, filter .24s ease; }
+.rocket-flame {
+  transform: scaleX(.88) scaleY(.62);
+  transform-box: fill-box;
+  transform-origin: 50% 0%;
+}
+.rocket-flame--inner, .rocket-flame--pod { fill: #fff5a1; filter: drop-shadow(0 0 7px #ff8c2b); }
+.rocket-flame--inner { animation: rocket-flame-flicker .17s ease-in-out infinite alternate; }
+.rocket-flame--pod { animation: rocket-flame-flicker .2s ease-in-out infinite alternate-reverse; }
+.rocket-card[data-phase="queued"] .rocket-flame-wrap { opacity: .45; }
+.rocket-card[data-phase="queued"] .rocket-flame { transform: scaleX(.94) scaleY(.82); }
+.rocket-card[data-phase="active"] .rocket-flame-wrap {
+  opacity: 1;
+  filter: drop-shadow(0 0 18px #ff8138) drop-shadow(0 20px 22px rgba(255, 74, 28, .64));
+}
+.rocket-card[data-phase="active"] .rocket-flame {
+  animation: rocket-launch-thrust .13s ease-in-out infinite alternate;
+}
+.rocket-card[data-phase="active"] .rocket-flame--inner,
+.rocket-card[data-phase="active"] .rocket-flame--pod {
+  animation-direction: alternate-reverse;
+}
+.rocket-card[data-phase="mishap"] .rocket-flame-wrap { opacity: .82; }
+.rocket-card[data-phase="mishap"] .rocket-flame { animation: rocket-sputter .19s steps(2) 5; }
+.rocket-card[data-phase="landed"] .rocket-flame-wrap { opacity: 0; }
+.rocket-stage[data-finale-status="countdown"] .rocket-flame-wrap { opacity: .58; }
+.rocket-stage[data-finale-status="countdown"] .rocket-flame { animation: rocket-engine-ready .7s ease-in-out infinite alternate; }
+
+.rocket-scoreplate {
+  position: absolute;
+  z-index: 7;
+  left: 50%;
+  bottom: max(1px, .25vh);
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  min-width: clamp(64px, 6.4vw, 124px);
+  padding: .26em .68em .34em;
+  border: 2px solid color-mix(in srgb, var(--team-color), white 28%);
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--team-color), #071328 57%), rgba(6, 13, 32, .96));
+  box-shadow: 0 7px 20px rgba(0, 0, 0, .48), inset 0 1px 0 rgba(255, 255, 255, .22), 0 0 12px color-mix(in srgb, var(--team-color), transparent 67%);
+  transform: translateX(-50%);
+  transform-origin: 50% 50%;
+  white-space: nowrap;
+}
+.rocket-score-value { font-family: var(--stage-heading); font-size: clamp(18px, 2.05vw, 39px); font-weight: 950; line-height: .9; font-variant-numeric: tabular-nums; }
+.rocket-score-unit { margin-left: .22em; color: rgba(255, 255, 255, .78); font-size: clamp(7px, .58vw, 11px); font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.rocket-score-cap { margin-left: .26em; color: rgba(255, 255, 255, .56); font-size: clamp(8px, .68vw, 13px); font-weight: 800; font-variant-numeric: tabular-nums; }
+.rocket-card--compact .rocket-scoreplate { min-width: clamp(54px, 5.2vw, 88px); border-width: 1px; }
+.rocket-card--compact .rocket-score-value { font-size: clamp(15px, 1.4vw, 25px); }
+
+.rocket-score-burst {
+  position: absolute;
+  z-index: 9;
+  left: 57%;
+  bottom: 11%;
+  padding: .28em .48em;
+  border-radius: 999px;
+  color: #05172d;
+  background: #80ffc5;
+  box-shadow: 0 0 18px rgba(91, 255, 186, .75);
+  font-family: var(--stage-heading);
+  font-size: clamp(14px, 1.5vw, 28px);
+  font-weight: 950;
+  animation: rocket-score-pop 1.2s ease-out both;
+}
+.rocket-score-burst--negative { color: #fff; background: #ff678f; box-shadow: 0 0 18px rgba(255, 83, 127, .65); }
+
+.rocket-parachute {
+  position: absolute;
+  z-index: 8;
+  top: -4%;
+  left: 24%;
+  width: 52%;
+  opacity: 0;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+}
+.rocket-parachute svg { display: block; width: 100%; overflow: visible; filter: drop-shadow(0 7px 8px rgba(0,0,0,.35)); }
+.parachute-canopy { fill: var(--team-color); stroke: #fff; stroke-width: 3; stroke-linejoin: round; }
+.parachute-lines { fill: none; stroke: rgba(255,255,255,.8); stroke-width: 2; }
+
+/* Announcement card. */
+.stage-announcement {
+  position: absolute;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 5vw;
+  background: radial-gradient(circle, rgba(10, 28, 76, .28), rgba(2, 5, 18, .74));
+  backdrop-filter: blur(7px);
+}
+.announcement-card {
+  position: relative;
+  width: min(84vw, 1120px);
+  max-height: 78vh;
+  padding: clamp(32px, 6vh, 82px) clamp(34px, 7vw, 108px);
+  overflow: hidden;
+  border: 2px solid var(--stage-line);
+  border-radius: clamp(24px, 3vw, 54px);
+  text-align: center;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.1), transparent 32%),
+    linear-gradient(150deg, color-mix(in srgb, var(--stage-accent-2), #0b2156 78%), var(--stage-panel-solid));
+  box-shadow: 0 4vh 10vh rgba(0,0,0,.56), inset 0 1px 0 rgba(255,255,255,.22), 0 0 6vh color-mix(in srgb, var(--stage-accent), transparent 82%);
+}
+.announcement-sheen { position: absolute; inset: -100% -50%; background: linear-gradient(105deg, transparent 42%, rgba(255,255,255,.12) 49%, transparent 56%); animation: announcement-sheen 2.8s ease-in-out infinite; }
+.announcement-kicker { margin: 0 0 .85em; color: var(--stage-accent); font-size: clamp(11px, 1.2vw, 21px); font-weight: 900; letter-spacing: .25em; text-transform: uppercase; }
+.announcement-title { position: relative; margin: 0; font-family: var(--stage-heading); font-size: clamp(42px, 7.4vw, 124px); line-height: .94; letter-spacing: -.045em; text-wrap: balance; text-shadow: 0 8px 25px rgba(0,0,0,.35); }
+.announcement-message { position: relative; max-width: 39em; margin: .9em auto 0; color: color-mix(in srgb, var(--stage-ink), transparent 12%); font-size: clamp(19px, 2vw, 36px); font-weight: 600; line-height: 1.35; text-wrap: balance; }
+.announcement-orbit { position: absolute; width: min(88vw, 1190px); aspect-ratio: 2.3; border: 2px solid color-mix(in srgb, var(--stage-accent), transparent 40%); border-radius: 50%; transform: rotate(-8deg); box-shadow: 0 0 8vh color-mix(in srgb, var(--stage-accent), transparent 79%); }
+.announcement-orbit i { position: absolute; width: 14px; height: 14px; border-radius: 50%; background: var(--stage-accent); box-shadow: 0 0 22px var(--stage-accent); }
+.announcement-orbit i:nth-child(1) { left: 8%; top: 20%; }
+.announcement-orbit i:nth-child(2) { right: 11%; top: 72%; }
+.announcement-orbit i:nth-child(3) { left: 55%; top: -7px; }
+.stage-announcement--award .announcement-card,
+.stage-announcement--celebration .announcement-card { background: linear-gradient(145deg, #4f2e7e, #123b76); border-color: #ffd96c; }
+.stage-announcement--warning .announcement-card { background: linear-gradient(145deg, #672c42, #342043); border-color: #ff9b70; }
+
+/* Finale countdown, launch calls, and complete standings. */
+.finale-overlay { position: absolute; z-index: 36; inset: 0; pointer-events: none; }
+.finale-overlay--countdown { display: grid; place-items: center; background: radial-gradient(circle, rgba(23,75,145,.34), rgba(1,4,15,.78)); backdrop-filter: blur(4px); }
+.finale-countdown-ring {
+  position: relative;
+  display: flex;
+  width: min(44vw, 58vh);
+  aspect-ratio: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: clamp(3px, .4vw, 8px) solid var(--stage-accent);
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--stage-accent), transparent 83%), rgba(3, 10, 28, .96) 67%);
+  box-shadow: 0 0 4vw color-mix(in srgb, var(--stage-accent), transparent 48%), inset 0 0 4vw color-mix(in srgb, var(--stage-accent), transparent 70%);
+}
+.finale-countdown-ring::before,
+.finale-countdown-ring::after { content: ""; position: absolute; border: 1px solid color-mix(in srgb, var(--stage-accent), transparent 42%); border-radius: 50%; animation: finale-ring-spin 7s linear infinite; }
+.finale-countdown-ring::before { inset: -7%; border-style: dashed; }
+.finale-countdown-ring::after { inset: 8%; border-left-color: transparent; border-right-color: transparent; animation-direction: reverse; animation-duration: 4s; }
+.finale-countdown-kicker, .finale-countdown-label { color: var(--stage-accent); font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.finale-countdown-kicker { font-size: clamp(10px, 1vw, 17px); }
+.finale-countdown-number { margin: .04em 0; font-family: var(--stage-heading); font-size: clamp(84px, 15vw, 240px); line-height: .82; text-shadow: 0 0 30px color-mix(in srgb, var(--stage-accent), transparent 40%); }
+.finale-countdown-label { font-size: clamp(11px, 1.3vw, 23px); }
+
+.finale-launch-callout {
+  position: absolute;
+  z-index: 26;
+  left: 50%;
+  top: clamp(68px, 9.5vh, 112px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: .62em 1.3em .72em;
+  border: 1px solid var(--stage-line);
+  border-radius: 16px;
+  background: rgba(4, 15, 40, .86);
+  box-shadow: 0 1.5vh 4vh rgba(0,0,0,.35), inset 0 2px var(--stage-accent);
+  transform: translateX(-50%);
+  backdrop-filter: blur(12px);
+  animation: finale-callout-in .45s ease-out both;
+}
+.finale-launch-callout span { color: var(--stage-accent); font-size: clamp(8px, .75vw, 13px); font-weight: 900; letter-spacing: .18em; text-transform: uppercase; }
+.finale-launch-callout strong { margin-top: .18em; font-family: var(--stage-heading); font-size: clamp(18px, 2vw, 36px); text-align: center; }
+.finale-launch-callout--mishap { box-shadow: 0 1.5vh 4vh rgba(0,0,0,.35), inset 0 2px #ffd56a; }
+.finale-launch-callout--mishap span { color: #ffd56a; }
+
+.finale-overlay--results { display: grid; place-items: center; overflow: hidden; background: radial-gradient(circle, rgba(54, 84, 175, .6), rgba(2,4,14,.93) 68%); backdrop-filter: blur(10px); }
+.winner-rays { position: absolute; width: 130vmax; height: 130vmax; opacity: .55; background: repeating-conic-gradient(from 0deg, rgba(255,218,107,.23) 0deg 5deg, transparent 5deg 14deg); animation: winner-rays-turn 48s linear infinite; }
+.winner-rays::after { content: ""; position: absolute; inset: 27%; border-radius: 50%; background: radial-gradient(circle, rgba(255,218,107,.25), transparent 65%); }
+.finale-results-card {
+  position: relative;
+  width: min(88vw, 1160px);
+  max-height: 88vh;
+  padding: clamp(24px, 4vh, 54px) clamp(28px, 5vw, 78px) clamp(18px, 3vh, 38px);
+  overflow: hidden;
+  border: 2px solid rgba(255, 221, 118, .64);
+  border-radius: clamp(22px, 2.5vw, 44px);
+  background: linear-gradient(145deg, rgba(30,43,105,.96), rgba(7,16,47,.97));
+  box-shadow: 0 4vh 12vh rgba(0,0,0,.7), inset 0 1px rgba(255,255,255,.2), 0 0 5vh rgba(255,208,85,.18);
+  text-align: center;
+}
+.finale-results-kicker { margin: 0 0 .45em; color: #ffe281; font-size: clamp(10px, 1vw, 17px); font-weight: 950; letter-spacing: .24em; text-transform: uppercase; }
+.finale-winners { display: flex; justify-content: center; flex-wrap: wrap; gap: clamp(8px, 1.2vw, 18px); }
+.finale-winner {
+  display: grid;
+  grid-template-columns: auto minmax(0, auto) auto;
+  align-items: center;
+  gap: .48em;
+  padding: .35em .7em .4em .38em;
+  border: 2px solid color-mix(in srgb, var(--team-color), white 35%);
+  border-radius: 999px;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--team-color), #101c4b 58%), #0b173c);
+  font-family: var(--stage-heading);
+  font-size: clamp(24px, 3.7vw, 66px);
+  line-height: 1;
+  box-shadow: 0 0 2vw color-mix(in srgb, var(--team-color), transparent 60%);
+}
+.finale-winner-icon { display: grid; width: .95em; aspect-ratio: 1; place-items: center; border-radius: 50%; color: #fff; background: var(--team-color); }
+.finale-winner-icon svg { width: 57%; }
+.finale-winner strong { padding-left: .45em; border-left: 1px solid rgba(255,255,255,.25); font-variant-numeric: tabular-nums; }
+.finale-results-card--many-winners .finale-winners { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: clamp(4px, .55vw, 8px); }
+.finale-results-card--many-winners .finale-winner { min-width: 0; grid-template-columns: auto minmax(0, 1fr) auto; padding: .28em .45em .3em .28em; font-size: clamp(13px, 1.55vw, 25px); }
+.finale-results-card--many-winners .finale-winner > span:not(.finale-winner-icon) { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.finale-standings { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: clamp(5px, .7vh, 10px) clamp(10px, 1.3vw, 20px); max-width: 960px; margin: clamp(14px, 2.3vh, 26px) auto 0; padding: 0; list-style: none; }
+.finale-standing { display: grid; grid-template-columns: auto auto minmax(0,1fr) auto; align-items: center; gap: .65em; padding: .5em .7em; border: 1px solid rgba(255,255,255,.12); border-radius: 10px; background: rgba(0,0,0,.21); font-size: clamp(11px, 1.05vw, 18px); text-align: left; }
+.finale-standing-rank { display: grid; width: 1.8em; aspect-ratio: 1; place-items: center; border-radius: 50%; color: var(--stage-muted); background: rgba(255,255,255,.08); font-weight: 900; }
+.finale-standing-swatch { width: .65em; height: 1.7em; border-radius: 999px; box-shadow: 0 0 7px currentColor; }
+.finale-standing-name { overflow: hidden; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.finale-standing strong { font-size: 1.25em; font-variant-numeric: tabular-nums; }
+.finale-results-footer { margin: clamp(12px, 2vh, 24px) 0 0; color: var(--stage-muted); font-size: clamp(10px, .95vw, 16px); font-weight: 650; letter-spacing: .04em; }
+
+/* Mirrored audience controls. */
+.stage-control-dock {
+  position: absolute;
+  z-index: 45;
+  left: 50%;
+  bottom: clamp(10px, 1.5vh, 20px);
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  max-width: calc(100% - 24px);
+  padding: .65rem .8rem;
+  border: 1px solid var(--stage-line);
+  border-radius: 18px;
+  opacity: 0;
+  background: rgba(3, 9, 24, .92);
+  box-shadow: 0 1.2rem 3rem rgba(0,0,0,.55);
+  transform: translate(-50%, calc(100% + 30px));
+  transition: opacity .25s ease, transform .35s ease;
+  backdrop-filter: blur(18px);
+}
+.stage-control-dock--visible,
+.stage-control-dock:focus-within,
+.stage-control-dock:hover { opacity: 1; transform: translate(-50%, 0); }
+.stage-control-dock-handle { position: absolute; left: 50%; top: -7px; width: 46px; height: 4px; border-radius: 3px; background: var(--stage-accent); transform: translateX(-50%); box-shadow: 0 0 10px var(--stage-accent); }
+
+/* Reserve a control-safe strip in audience-controlled mode. The dock may
+   auto-hide, but it must never cover a rocket's exact numeric score. */
+.rocket-stage--mirrored .stage-fleet {
+  bottom: clamp(76px, 11vh, 118px);
+}
+
+.stage-empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; color: var(--stage-muted); text-align: center; }
+.stage-empty-state h2 { margin: .8em 0 .2em; color: var(--stage-ink); font-family: var(--stage-heading); font-size: clamp(26px, 4vw, 60px); }
+.stage-empty-state p { margin: 0; font-size: clamp(14px, 1.5vw, 24px); }
+.stage-empty-orbit { position: relative; width: clamp(70px, 9vw, 150px); aspect-ratio: 1; border: 2px solid var(--stage-accent); border-radius: 50%; }
+.stage-empty-orbit::after { content:""; position:absolute; inset: 27%; border-radius:50%; background:var(--stage-accent-2); box-shadow:0 0 30px var(--stage-accent-2); }
+.stage-empty-orbit i { position:absolute; width:12%; aspect-ratio:1; border-radius:50%; background:#fff; animation:stage-orbit 4s linear infinite; transform-origin: 420% 420%; }
+
+.rocket-stage--paused *, .rocket-stage--paused *::before, .rocket-stage--paused *::after { animation-play-state: paused !important; }
+
+/* Embedded presenter preview keeps every visual but scales chrome down. */
+.rocket-stage--preview .stage-hud { min-height: 42px; padding: 8px 12px; }
+.rocket-stage--preview .stage-title-lockup p { display: none; }
+.rocket-stage--preview .stage-title-lockup h1 { font-size: clamp(11px, 2vw, 20px); }
+.rocket-stage--preview .stage-mission-mark { width: 26px; }
+.rocket-stage--preview .stage-status-badge { display: none; }
+.rocket-stage--preview .stage-fleet { inset: 46px 5px 5px; }
+.rocket-stage--preview .rocket-team-label { min-height: 20px; padding: 2px 7px 2px 3px; }
+.rocket-stage--preview .rocket-team-name { font-size: clamp(7px, 1.5vw, 13px); }
+.rocket-stage--preview .rocket-team-index { width: 14px; }
+.rocket-stage--preview .rocket-scoreplate { min-width: 38px; padding: 2px 5px; }
+.rocket-stage--preview .rocket-score-value { font-size: clamp(10px, 1.8vw, 18px); }
+.rocket-stage--preview .rocket-score-unit,
+.rocket-stage--preview .rocket-score-cap { font-size: 6px; }
+
+/* 4:3 projectors get a shallower header and tighter, balanced fleet. */
+@media (max-aspect-ratio: 4/3) {
+  .stage-hud { min-height: 7.8vh; padding-top: 1.4vh; padding-bottom: 1.2vh; }
+  .stage-fleet { top: 8.2vh; }
+  .stage-title-lockup p { font-size: clamp(7px, .8vw, 11px); }
+  .stage-title-lockup h1 { font-size: clamp(17px, 2.3vw, 31px); max-width: 47vw; }
+  .stage-status-badge--capacity { display: none; }
+  .rocket-team-label { min-height: 3.2vh; }
+  .rocket-team-name { font-size: clamp(10px, 1.25vw, 17px); }
+  .rocket-score-value { font-size: clamp(14px, 1.8vw, 25px); }
+  .finale-results-card { width: 94vw; }
+}
+
+@media (max-height: 650px) {
+  .stage-hud { min-height: 54px; padding-top: 10px; padding-bottom: 8px; }
+  .stage-fleet { inset-top: 58px; }
+  .rocket-team-label { min-height: 25px; }
+  .rocket-scoreplate { bottom: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rocket-stage { --system-reduced-motion: 1; }
+}
+
+.rocket-stage[data-reduced-motion="true"] *,
+.rocket-stage[data-reduced-motion="true"] *::before,
+.rocket-stage[data-reduced-motion="true"] *::after {
+  animation-duration: .001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: .001ms !important;
+}
+
+@keyframes stage-nebula-drift { to { transform: translate(8vmax, 4vmax) scale(1.14); } }
+@keyframes stage-star-pulse { 0%,100% { transform: scale(.65); opacity: calc(var(--particle-alpha) * .55); } 50% { transform: scale(1.3); opacity: var(--particle-alpha); } }
+@keyframes stage-dust-drift { to { transform: translate(7vw, -4vh) scale(1.18); } }
+@keyframes stage-confetti-fall { to { transform: translate(7vw, 108vh) rotate(var(--particle-spin)); } }
+@keyframes stage-orbit { to { transform: rotate(360deg); } }
+@keyframes stage-selection-pulse { 50% { opacity: .95; transform: scale(1.015); } }
+@keyframes rocket-flame-flicker {
+  from { transform: scaleX(.88) scaleY(.62); }
+  to { transform: scaleX(.78) scaleY(.76); }
+}
+@keyframes rocket-launch-thrust {
+  from { transform: scaleX(var(--launch-thrust-width-flicker)) scaleY(var(--launch-thrust-length-flicker)); }
+  to { transform: scaleX(var(--launch-thrust-width)) scaleY(var(--launch-thrust-length)); }
+}
+@keyframes rocket-sputter { 0%, 39% { opacity: .95; transform: scaleY(.8); } 40%, 72% { opacity: .12; transform: scaleY(.25); } 73%, 100% { opacity: .82; transform: scaleY(.62); } }
+@keyframes rocket-engine-ready {
+  from { transform: scaleX(.9) scaleY(.72); }
+  to { transform: scaleX(1) scaleY(1.08); filter: drop-shadow(0 0 10px #ff9b38); }
+}
+@keyframes rocket-score-pop { 0% { opacity: 0; transform: translateY(12px) scale(.5); } 28% { opacity: 1; transform: translateY(-8px) scale(1.12); } 100% { opacity: 0; transform: translateY(-52px) scale(.9); } }
+@keyframes announcement-sheen { 0%,45% { transform: translateX(-35%); } 100% { transform: translateX(35%); } }
+@keyframes finale-ring-spin { to { transform: rotate(360deg); } }
+@keyframes finale-callout-in { from { opacity: 0; transform: translate(-50%, -15px) scale(.92); } to { opacity: 1; transform: translate(-50%, 0) scale(1); } }
+@keyframes winner-rays-turn { to { transform: rotate(360deg); } }
+
+.stage-loading {
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  place-items: center;
+  align-content: center;
+  gap: 18px;
+  color: #a8b7d9;
+  background: radial-gradient(circle at 50% 55%, #11265a, #030817 68%);
+  font: 750 15px/1.2 "Avenir Next", system-ui, sans-serif;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+.stage-loading i {
+  width: 54px;
+  height: 54px;
+  border: 3px solid rgba(103,232,255,.2);
+  border-top-color: #67e8ff;
+  border-radius: 50%;
+  animation: finale-ring-spin .8s linear infinite;
+}

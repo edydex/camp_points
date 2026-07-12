@@ -1,0 +1,19 @@
+node_modules/
+out/
+dist/
+release/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+*.rocketshow.autosave
+
+# Retired prototype theme audio; current builds use Cartoon Sci-Fi plus the
+# credited bundled MP3 ambience loop.
+src/renderer/audio/assets/accent-retro.wav
+src/renderer/audio/assets/accent-cinematic.wav
+src/renderer/audio/assets/ambience-*.wav
